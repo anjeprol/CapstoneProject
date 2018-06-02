@@ -12,7 +12,6 @@
 
     <style name="ToolbarStyle">
 
-        <item name="android:theme">@style/ThemeOverlay.AppCompat.ActionBar</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">?attr/actionBarSize</item>
         <item name="android:background">?attr/colorPrimary</item>
@@ -22,5 +21,9 @@
         <item name="android:elevation" tools:targetApi="lollipop">@dimen/toolbar_elevation</item>
 
     </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 </resources>
