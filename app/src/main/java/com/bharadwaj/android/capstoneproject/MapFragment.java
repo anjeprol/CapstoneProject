@@ -18,7 +18,7 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 import timber.log.Timber;
 
 import static android.app.Activity.RESULT_OK;
-import static constants.Constants.PLACE_PICKER_REQUEST;
+import static com.bharadwaj.android.capstoneproject.constants.Constants.PLACE_PICKER_REQUEST;
 
 public class MapFragment extends Fragment {
 
@@ -64,6 +64,7 @@ public class MapFragment extends Fragment {
             if (resultCode == RESULT_OK) {
                 Place place = PlacePicker.getPlace(getActivity(), data);
                 String toastMsg = String.format("Place: %s", place.getName());
+                Timber.v("Place Name : %s", place.getAddress());
                 Toast.makeText(getContext(), toastMsg, Toast.LENGTH_LONG).show();
             }
         }
@@ -88,7 +89,7 @@ public class MapFragment extends Fragment {
     }
 
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
+        // TODO: Update argument placeType and name
         void onFragmentInteraction(Uri uri);
     }
 }

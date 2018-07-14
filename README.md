@@ -6,6 +6,6 @@ Tell the app your search preferences only once and it knows how to personalize t
 
 Share a place with your friend.
 
-Favorite any number of locations and you can view them again later even without network. 
+Favorite any number of locations and you can view them again later even without com.bharadwaj.android.capstoneproject.network.
 
 Let this app be your travel planner...

@@ -1,5 +1,10 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
@@ -22,8 +27,56 @@
 
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="SaperatorStyle">
+        <item name="android:background">@color/primary_dark</item>
+        <item name="android:layout_marginTop">@dimen/separatorMargin</item>
+        <item name="android:layout_marginBottom">@dimen/separatorMargin</item>
+    </style>
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+
+
+    <style name="placeTextStyle">
+        <item name="android:layout_marginLeft">@dimen/text_margin_left</item>
+        <item name="android:layout_marginRight">@dimen/text_margin_right</item>
+    </style>
+
+    <style name="edgePlaceTextStyle" parent="placeTextStyle">
+        <item name="android:layout_marginTop">@dimen/text_margin_top</item>
+    </style>
+
+    <style name="placeNameTextStyle" parent="edgePlaceTextStyle">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="placeRatingTextStyle" parent="placeTextStyle">
+        <item name="android:textStyle">italic</item>
+        <item name="android:textColor">@color/accent</item>
+    </style>
+
+    <style name="placeAddressTextStyle" parent="placeTextStyle">
+        <item name="android:textColor">@color/secondary_text</item>
+
+        <item name="android:singleLine">false</item>
+    </style>
+
+    <style name="noPlacesExplanationViewTextStyle" >
+        <item name="android:textStyle">bold</item>
+    </style>
+
+
+
+    <style name="ButtonStyle">
+        <item name="android:background">@android:color/white</item>
+        <item name="android:textColor">@color/text_and_icons</item>
+        <item name="android:layout_marginLeft">@dimen/button_margin_left</item>
+        <item name="android:layout_marginRight">@dimen/button_margin_right</item>
+        <item name="android:layout_marginTop">@dimen/button_margin_top</item>
+        <item name="android:layout_marginBottom">@dimen/button_margin_bottom</item>
+    </style>
+
+    <style name="placePriceLevelTextStyle" parent="placeTextStyle" >
+        <item name="android:layout_marginLeft">@dimen/text_extra_margin_left</item>
+    </style>
 
 </resources>

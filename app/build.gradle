@@ -1,10 +1,19 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'Bharadwaj'
+            keyPassword 'vnsRoyal@2892'
+            storeFile file('/Users/Bharadwaj/.android')
+            storePassword 'vnsRoyal@2892'
+        }
+    }
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.bharadwaj.android.capstoneproject"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
@@ -19,18 +28,25 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "com.android.support:support-v4:$rootProject.support_library_version"
     implementation "com.android.support:appcompat-v7:$rootProject.support_library_version"
-
     implementation 'com.android.support:design:27.1.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    implementation 'com.android.support:support-v4:27.1.1'
+    implementation 'com.android.support:recyclerview-v7:27.1.1'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation "com.android.support.test.espresso:espresso-core:$rootProject.espresso_version"
 
+    //Gson
+    implementation "com.google.code.gson:gson:$rootProject.gson_version"
+
     //Timber
     implementation "com.jakewharton.timber:timber:$rootProject.timber_version"
+
+    //Material Favorite Button API
+    implementation "com.github.ivbaranov:materialfavoritebutton:$rootProject.material_favorite_version"
 
     //Butter Knife library
     implementation "com.jakewharton:butterknife:$rootProject.butterknife"
@@ -40,4 +56,16 @@ dependencies {
     implementation "com.google.android.gms:play-services-maps:$rootProject.gms_maps_version"
     implementation "com.google.android.gms:play-services-places:$rootProject.gms_places_version"
 
+    //Retrofit for making REST calls on com.bharadwaj.android.capstoneproject.network
+    implementation "com.squareup.retrofit2:retrofit:$rootProject.retrofit_version"
+    implementation "com.squareup.retrofit2:converter-gson:$rootProject.retrofit_version"
+
+    //For String functions
+    implementation 'org.apache.commons:commons-lang3:3.6'
+
+    //Google Ads
+    implementation "com.google.android.gms:play-services-ads:$rootProject.google_ads_version"
+
+    //FireBase
+    implementation "com.google.firebase:firebase-core:$rootProject.firebase_version"
 }

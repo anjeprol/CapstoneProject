@@ -3,35 +3,71 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <group android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Import" />
-        <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery" />
-        <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
-        <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
-    </group>
 
-    <item android:title="Communicate">
+    <item android:title="@string/essentials">
         <menu>
-            <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/pharmacy"
+                    android:title="@string/pharmacy"
+                    android:titleCondensed="test"/>
+                <item
+                    android:id="@+id/doctor"
+                    android:title="@string/doctor" />
+            </group>
+        </menu>
+    </item>
+
+
+    <item android:title="@string/food">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/restaurant"
+                    android:title="@string/restaurant" />
+                <item
+                    android:id="@+id/bakery"
+                    android:title="@string/bakery" />
+                <item
+                    android:id="@+id/cafe"
+                    android:title="@string/cafe" />
+            </group>
+        </menu>
+    </item>
+
+
+    <item android:title="@string/fun">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/amusement_park"
+                    android:title="@string/amusement_parks" />
+                <item
+                    android:id="@+id/casino"
+                    android:title="@string/casinos" />
+                <item
+                    android:id="@+id/night_club"
+                    android:title="@string/night_clubs" />
+            </group>
+        </menu>
+    </item>
+
+    <item android:title="@string/auto">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/car_wash"
+                    android:title="@string/car_wash" />
+                <item
+                    android:id="@+id/car_repair"
+                    android:title="@string/car_repair" />
+                <item
+                    android:id="@+id/car_dealer"
+                    android:title="@string/car_dealer" />
+                <item
+                    android:id="@+id/car_rental"
+                    android:title="@string/car_rental" />
+            </group>
         </menu>
     </item>
 
