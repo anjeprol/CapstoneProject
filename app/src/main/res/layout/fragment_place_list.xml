@@ -12,6 +12,12 @@
         style="@style/noPlacesExplanationViewTextStyle"
         android:layout_marginTop="?attr/actionBarSize"/>
 
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_height="wrap_content" />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/placeList"
         android:name="com.bharadwaj.android.capstoneproject.PlaceFragment"
@@ -29,7 +35,7 @@
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
         ads:adSize="BANNER"
-        ads:adUnitId="@string/ad_unit_id">
+        ads:adUnitId="@string/admob_ad_unit_id">
     </com.google.android.gms.ads.AdView>
     <!-- Test with Google's Test AdUnitID = ca-app-pub-3940256099942544/6300978111  is SUCCESS-->
 

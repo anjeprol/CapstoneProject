@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         placeType = sharedPreferences.getString(Constants.TYPE_OF_PLACE, "");
-
+        Timber.v("Loading places for type : %s", placeType);
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -173,6 +173,7 @@ public class MainActivity extends AppCompatActivity
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPreferences.edit().putString(Constants.TYPE_OF_PLACE, placeType).apply();
+        Timber.d("Place type saved to preferences : %s", PreferenceManager.getDefaultSharedPreferences(this).getString(Constants.TYPE_OF_PLACE, ""));
 
         mPlaceFragment.loadPlaces(placeType, "");
 
@@ -180,15 +181,6 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         Timber.d("Leaving onNavigationItemSelected");
         return true;
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Timber.d("Entering onDestroy");
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        sharedPreferences.edit().putString(Constants.TYPE_OF_PLACE, "").apply();
-        Timber.d("Leaving onDestroy");
     }
 
 }

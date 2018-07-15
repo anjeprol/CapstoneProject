@@ -1,5 +1,5 @@
 <resources>
 
-    <string name="admob_api_key" >ca-app-pub-9850681598061353~4705453424</string>
-    <string name="ad_unit_id" >ca-app-pub-9850681598061353/3173698143</string>
+    <string name="admob_ad_unit_id" >ca-app-pub-9850681598061353/3173698143</string>
+    <string name="adMob_app_id" >ca-app-pub-9850681598061353~4705453424</string>
 </resources>

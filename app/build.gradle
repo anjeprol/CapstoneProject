@@ -3,10 +3,10 @@ apply plugin: 'com.google.gms.google-services'
 
 android {
     signingConfigs {
-        config {
+        release {
             keyAlias 'Bharadwaj'
             keyPassword 'vnsRoyal@2892'
-            storeFile file('/Users/Bharadwaj/.android')
+            storeFile file('/Users/Bharadwaj/android')
             storePassword 'vnsRoyal@2892'
         }
     }
@@ -23,6 +23,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 }

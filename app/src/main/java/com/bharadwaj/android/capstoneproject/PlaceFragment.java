@@ -25,6 +25,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -83,10 +84,13 @@ public class PlaceFragment extends Fragment implements
 
     @BindView(R.id.noPlacesExplanationView)
     TextView mNoPlacesExplanationView;
+    @BindView(R.id.progress_bar)
+    ProgressBar mProgressBar;
     @BindView(R.id.placeList)
     RecyclerView mPlacesRecyclerView;
     @BindView(R.id.adView)
     AdView mAdView;
+
 
     ItemTouchHelper.SimpleCallback itemTouchHelperCallback;
 
@@ -130,8 +134,10 @@ public class PlaceFragment extends Fragment implements
         mPlacesRecyclerView.setAdapter(placeAdapter);
 
         if(placeAdapter.isFavoriteContext()){
+            mProgressBar.setVisibility(View.GONE);
             showFavoritePlaces();
         }else{
+            showProgressBarAndHideRecyclerView();
             if(!NetworkUtils.isConnectedToInternet(getActivity())){
                 Toast.makeText(getActivity(), "Not connected to Internet.", Toast.LENGTH_LONG).show();
             }else{
@@ -162,6 +168,7 @@ public class PlaceFragment extends Fragment implements
     }
 
     public void loadPlaces(String type, String rankBy) {
+        showProgressBarAndHideRecyclerView();
         Map<String, String> preferenceMap = getSharedPreferences(type, rankBy);
         Call<GooglePlacesAPIResponse> recipesList = NetworkUtils.getPlaces(preferenceMap);
         Timber.v("Request: %s", recipesList.request().url());
@@ -214,13 +221,13 @@ public class PlaceFragment extends Fragment implements
                         Timber.v("Places count: %s", places.getCount());
 
                         for (Place place : places) {
-                            Timber.v("Place found: %s", place.getName());
+                            //Timber.v("Place found: %s", place.getName());
                             placesArray.add(place);
                         }
                         //places.release();
 
                         placeAdapter.fillPlacesData(placesArray);
-
+                        showRecyclerViewAndHideProgressBar();
                     } else {
                         Timber.e("getPlaceById operation failed.");
                         Toast.makeText(getActivity(), "Operation failed", Toast.LENGTH_LONG).show();
@@ -228,6 +235,16 @@ public class PlaceFragment extends Fragment implements
                 }
             });
         }else Timber.e("Activity is NULL");
+    }
+
+    private void showRecyclerViewAndHideProgressBar() {
+        mPlacesRecyclerView.setVisibility(View.VISIBLE);
+        mProgressBar.setVisibility(View.INVISIBLE);
+    }
+
+    private void showProgressBarAndHideRecyclerView() {
+        mPlacesRecyclerView.setVisibility(View.INVISIBLE);
+        mProgressBar.setVisibility(View.VISIBLE);
     }
 
     private String[] getPlaceIdsAsArray(GooglePlacesAPIResponse googlePlacesAPIResponse) {
@@ -420,12 +437,14 @@ public class PlaceFragment extends Fragment implements
     private void loadMobileAds(){
         Bundle applicationInfoBundle = getApplicationInfoBundle();
 
-        String apiKey = applicationInfoBundle.getString(Constants.ADMOB_APP_ID_FROM_MANIFEST);
-        Timber.v("ADMob API Key : %s", apiKey);
-        MobileAds.initialize(getActivity(), apiKey);
+        String adMobAppId = applicationInfoBundle.getString(Constants.ADMOB_APP_ID_FROM_MANIFEST);
+        Timber.v("ADMob API Key : %s", adMobAppId);
+        MobileAds.initialize(getActivity(), adMobAppId);
 
-        AdRequest adRequest = new AdRequest.Builder().build();
+        AdRequest adRequest = new AdRequest.Builder()
+                .build();
         mAdView.loadAd(adRequest);
+        Timber.v("Is test device : %s", adRequest.isTestDevice(getActivity()));
     }
 
 
