@@ -44,7 +44,7 @@ public class SeekBarPreference extends DialogPreference implements SeekBar.OnSee
         else
             mSuffix = mContext.getString(mSuffixId);
 
-        mDefault = attrs.getAttributeIntValue(androidns, Constants.DEFAULT_VALUE, 1);
+        mDefault = attrs.getAttributeIntValue(androidns, Constants.DEFAULT_VALUE, 2);
         mMax = attrs.getAttributeIntValue(androidns, Constants.MAX, 100);
         Timber.d("Leaving SeekBarPreference");
     }
