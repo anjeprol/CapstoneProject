@@ -45,8 +45,9 @@ dependencies {
     //Timber
     implementation "com.jakewharton.timber:timber:$rootProject.timber_version"
 
-    //Material Favorite Button API
-    implementation "com.github.ivbaranov:materialfavoritebutton:$rootProject.material_favorite_version"
+    //Parceler library for models
+    implementation "org.parceler:parceler-api:$rootProject.parceler"
+    annotationProcessor "org.parceler:parceler:$rootProject.parceler"
 
     //Butter Knife library
     implementation "com.jakewharton:butterknife:$rootProject.butterknife"

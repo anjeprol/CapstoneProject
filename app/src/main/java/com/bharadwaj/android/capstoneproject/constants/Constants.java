@@ -66,4 +66,7 @@ public final class Constants {
     public static final String NO_FAVORITES_EXPLANATION_TEXT = "No Favorite Places Yet.";
     public static final String FAVORITES_SWIPE_EXPLANATION_TEXT = "Here're your Favorite Places. \nSwipe left/right to delete a place.";
 
+    public static final String PLACES_NAMES_LIST = "places_names";
+    public static final String UPDATE_ACTION = "android.appwidget.action.APPWIDGET_UPDATE";
+    public static final String NULL = "null";
 }

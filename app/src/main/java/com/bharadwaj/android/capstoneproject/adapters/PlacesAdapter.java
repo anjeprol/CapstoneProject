@@ -3,25 +3,31 @@ package com.bharadwaj.android.capstoneproject.adapters;
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.bharadwaj.android.capstoneproject.PlaceFragment;
 import com.bharadwaj.android.capstoneproject.R;
 import com.bharadwaj.android.capstoneproject.constants.Constants;
 import com.bharadwaj.android.capstoneproject.favorites.FavoriteContract;
 import com.bharadwaj.android.capstoneproject.favorites.FavoriteContract.Favorites;
 import com.bharadwaj.android.capstoneproject.favorites.FavoritesActivity;
+import com.bharadwaj.android.capstoneproject.utils.ExtractionUtils;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.maps.model.LatLng;
+
+import org.parceler.Parcels;
 
 import java.util.List;
 
@@ -37,26 +43,9 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.PlaceViewH
     public static final int FAVORITES_LOADER_ID = 51;
 
     private final Context mContext;
-    private final PlaceFragment.OnCallButtonInteractionListener mCallButtonListener;
-    private final PlaceFragment.OnMapsButtonInteractionListener mMapsButtonListener;
-    private final PlaceFragment.OnWebsiteButtonInteractionListener mWebsiteButtonListener;
-    private final PlaceFragment.OnShareButtonInteractionListener mShareButtonListener;
-    private final PlaceFragment.OnFavoriteButtonInteractionListener mFavoriteButtonListener;
 
-    public PlacesAdapter(Context context,
-                         PlaceFragment.OnCallButtonInteractionListener callListener,
-                         PlaceFragment.OnMapsButtonInteractionListener mapsListener,
-                         PlaceFragment.OnWebsiteButtonInteractionListener websiteListener,
-                         PlaceFragment.OnShareButtonInteractionListener shareListener,
-                         PlaceFragment.OnFavoriteButtonInteractionListener favoriteListener) {
+    public PlacesAdapter(Context context) {
         mContext = context;
-        mCallButtonListener = callListener;
-        mMapsButtonListener = mapsListener;
-        mWebsiteButtonListener = websiteListener;
-        mShareButtonListener = shareListener;
-        mFavoriteButtonListener = favoriteListener;
-
-
         if(mContext.getClass().equals(FavoritesActivity.class)){
             isContextFavorites = true;
             Timber.v("PlaceAdapter tying to Favorites Context");
@@ -103,6 +92,9 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.PlaceViewH
         final String placeRating;
         final String placePriceLevel;
         final String placeAddress;
+        final String placePhoneNumber;
+        final String placeWebsiteUri;
+        final String placeLatLong;
 
         final Place currentPlace;
 
@@ -114,6 +106,9 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.PlaceViewH
             placeRating = mCursor.getString(mCursor.getColumnIndex(Favorites.COLUMN_PLACE_RATING));
             placePriceLevel = mCursor.getString(mCursor.getColumnIndex(Favorites.COLUMN_PLACE_PRICE_LEVEL));
             placeAddress = mCursor.getString(mCursor.getColumnIndex(Favorites.COLUMN_ADDRESS));
+            placePhoneNumber = mCursor.getString(mCursor.getColumnIndex(Favorites.COLUMN_PLACE_PHONE_NUMBER));
+            placeWebsiteUri = mCursor.getString(mCursor.getColumnIndex(Favorites.COLUMN_PLACE_WEBSITE_URI));
+            placeLatLong = mCursor.getString(mCursor.getColumnIndex(Favorites.COLUMN_PLACE_LATLONG));
 
         }else{
             currentPlace = mPlaces.get(position);
@@ -122,6 +117,9 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.PlaceViewH
             placeRating = String.valueOf(currentPlace.getRating());
             placePriceLevel = String.valueOf(currentPlace.getPriceLevel());
             placeAddress = String.valueOf(currentPlace.getAddress());
+            placePhoneNumber = String.valueOf(currentPlace.getPhoneNumber());
+            placeWebsiteUri = String.valueOf(currentPlace.getWebsiteUri());
+            placeLatLong = ExtractionUtils.getFormattedLocationString(currentPlace.getLatLng());
         }
 
         placeViewHolder.placeId = placeId;
@@ -131,50 +129,69 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.PlaceViewH
         placeViewHolder.placeRatingBar.setRating(Float.valueOf(placeRating));
         placeViewHolder.placePriceLevelView.setText(setDollarsByPriceLevel(placePriceLevel));
         placeViewHolder.placeAddressView.setText(placeAddress);
+
         placeViewHolder.placeCallButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (null != mCallButtonListener) {
-                    mCallButtonListener.onCallButtonInteraction(String.valueOf(currentPlace.getPhoneNumber()));
+                Timber.v("Call button clicked. ");
+                if (TextUtils.isEmpty(placePhoneNumber)) {
+                    Toast.makeText(mContext, "Phone number empty", Toast.LENGTH_SHORT).show();
                 } else {
-                    Timber.e("Call Button Listener is NULL");
+                    Uri phoneCallUri = Uri.parse(Constants.CALL_INTENT_DATA + placePhoneNumber);
+                    Intent callIntent = new Intent(Intent.ACTION_DIAL, phoneCallUri);
+                    if (isIntentAvailable(callIntent)) {
+                        Timber.v("Opening call intent to call : %s", placePhoneNumber);
+                        mContext.startActivity(callIntent);
+                    }
                 }
             }
         });
+
         placeViewHolder.placeMapsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (null != mMapsButtonListener) {
-                    mMapsButtonListener.onMapsButtonInteraction(getFormattedLocationString(currentPlace.getLatLng()));
-                } else {
-                    Timber.e("Maps Button Listener is NULL");
+                Timber.v("Maps button clicked. ");
+                Uri googleMapsEndPointUri = Uri.parse(Constants.MAPS_END_POINT + placeLatLong);
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, googleMapsEndPointUri);
+                if (isIntentAvailable(mapIntent)) {
+                    Timber.v("Opening Maps intent for coordinates : %s", googleMapsEndPointUri.getAuthority());
+                    mContext.startActivity(mapIntent);
                 }
             }
         });
+
         placeViewHolder.placeWebsiteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (null != mWebsiteButtonListener) {
-                    Timber.e("Website : " + currentPlace.getWebsiteUri());
-                    mWebsiteButtonListener.onWebsiteButtonInteraction(currentPlace.getWebsiteUri());
-                } else {
-                    Timber.e("Website Button Listener is NULL");
+                Timber.v("Website button clicked. ");
+                if (TextUtils.isEmpty(placeWebsiteUri) || placeWebsiteUri.trim().equalsIgnoreCase(Constants.NULL)) {
+                    Toast.makeText(mContext, "No Website linked", Toast.LENGTH_SHORT).show();
+                }else {
+                    Intent websiteIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(placeWebsiteUri));
+                    if (isIntentAvailable(websiteIntent)) {
+                        Timber.v("Opening Website intent to Uri : %s", placeWebsiteUri);
+                        mContext.startActivity(websiteIntent);
+                    }
                 }
             }
         });
+
         placeViewHolder.placeShareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (null != mShareButtonListener) {
-                    Timber.e("Website : " + currentPlace.getWebsiteUri());
-                    mShareButtonListener.onShareButtonInteraction(currentPlace.getWebsiteUri());
-                } else {
-                    Timber.e("Share Button Listener is NULL");
+                Timber.v("Share button clicked. ");
+                if (TextUtils.isEmpty(placeWebsiteUri) || placeWebsiteUri.trim().equalsIgnoreCase(Constants.NULL)) {
+                    Toast.makeText(mContext, "No Website linked to share", Toast.LENGTH_SHORT).show();
+                }else{
+                    Intent shareIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.SMS_INTENT_DATA));
+                    shareIntent.putExtra(Constants.SMS_BODY_HEADER, Constants.SMS_BODY + placeWebsiteUri);
+                    if (isIntentAvailable(shareIntent)) {
+                        Timber.v("Opening message intent");
+                        mContext.startActivity(shareIntent);
+                    }
                 }
             }
         });
-
-
 
         if(isContextFavorites){
             placeViewHolder.placeFavoriteButton.setVisibility(View.GONE);
@@ -193,7 +210,8 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.PlaceViewH
                     deletePlaceFromDB(placeId);
                     placeViewHolder.placeFavoriteButton.setImageResource(R.drawable.ic_favorite_border);
                 }else {
-                    insertPlaceIntoDB(placeId, placeName, placeRating, placePriceLevel, placeAddress);
+                    insertPlaceIntoDB(placeId, placeName, placeRating, placePriceLevel, placeAddress,
+                            placePhoneNumber, placeWebsiteUri, placeLatLong);
                     placeViewHolder.placeFavoriteButton.setImageResource(R.drawable.ic_favorite_filled);
                 }
 
@@ -217,7 +235,14 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.PlaceViewH
 
 
 
-    void insertPlaceIntoDB(String placeId, String placeName, String placeRating, String placePriceLevel, String placeAddress) {
+    void insertPlaceIntoDB(String placeId,
+                           String placeName,
+                           String placeRating,
+                           String placePriceLevel,
+                           String placeAddress,
+                           String phoneNumber,
+                           String placeWebsiteUri,
+                           String placeLatLong) {
 
         Timber.v("Inserting Place : %s", placeName);
 
@@ -227,9 +252,13 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.PlaceViewH
         contentValues.put(Favorites.COLUMN_PLACE_RATING, placeRating);
         contentValues.put(Favorites.COLUMN_PLACE_PRICE_LEVEL, placePriceLevel);
         contentValues.put(Favorites.COLUMN_ADDRESS, placeAddress);
+        contentValues.put(Favorites.COLUMN_PLACE_PHONE_NUMBER, phoneNumber);
+        contentValues.put(Favorites.COLUMN_PLACE_WEBSITE_URI, placeWebsiteUri);
+        contentValues.put(Favorites.COLUMN_PLACE_LATLONG, placeLatLong);
 
         Uri insertedRowUri = mContext.getContentResolver().insert(FavoriteContract.Favorites.PLACES_CONTENT_URI, contentValues);
         Timber.v("Inserted Row Uri is : %s", insertedRowUri.getPath());
+        SendBroadcastToupdateAppWidgets();
     }
 
     void deletePlaceFromDB(String placeID) {
@@ -245,6 +274,7 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.PlaceViewH
         } else {
             Timber.v("This movie is not in th favorites DB ");
         }
+        SendBroadcastToupdateAppWidgets();
     }
 
     private boolean checkIfPlaceIsFavorite(String placeID) {
@@ -258,13 +288,16 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.PlaceViewH
                 selectionArgs,
                 null);
         if (cursor.getCount() == 0) {
-            //implement
-            Timber.v("This movie isn't a favorite ");
             return false;
         } else {
-            Timber.v("This movie is a favorite one ");
             return true;
         }
+    }
+
+    private void SendBroadcastToupdateAppWidgets(){
+        Intent newIntent = new Intent(Constants.UPDATE_ACTION);
+        newIntent.putExtra(Constants.PLACES_NAMES_LIST, Parcels.wrap(ExtractionUtils.getPlacesNamesListFromCursor(mContext)));
+        mContext.sendBroadcast(newIntent);
     }
 
     private String setDollarsByPriceLevel(String priceLevel) {
@@ -288,8 +321,10 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.PlaceViewH
         }
     }
 
-    private String getFormattedLocationString(LatLng latLng) {
-        return latLng.latitude + "," + latLng.longitude;
+    public boolean isIntentAvailable(Intent intent) {
+        final PackageManager packageManager = mContext.getPackageManager();
+        List<ResolveInfo> list = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+        return list.size() > 0;
     }
 
     public class PlaceViewHolder extends RecyclerView.ViewHolder {

@@ -64,6 +64,11 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="placesCategoriesExplanationStyle" parent="placeTextStyle">
+        <item name="android:layout_marginLeft">@dimen/text_margin_left</item>
+        <item name="android:layout_marginRight">@dimen/text_margin_right</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 
 
     <style name="ButtonStyle">

@@ -27,6 +27,9 @@ public class FavoriteDBHelper extends SQLiteOpenHelper {
                 Favorites.COLUMN_PLACE_NAME + " TEXT NOT NULL, " +
                 Favorites.COLUMN_PLACE_RATING + " TEXT NOT NULL, " +
                 Favorites.COLUMN_PLACE_PRICE_LEVEL + " TEXT NOT NULL, " +
+                Favorites.COLUMN_PLACE_PHONE_NUMBER + " TEXT NOT NULL, " +
+                Favorites.COLUMN_PLACE_WEBSITE_URI + " TEXT NOT NULL, " +
+                Favorites.COLUMN_PLACE_LATLONG + " TEXT NOT NULL, " +
                 Favorites.COLUMN_ADDRESS + " TEXT NOT NULL);";
 
         Timber.v("Creating Table: %s", TABLE_NAME);

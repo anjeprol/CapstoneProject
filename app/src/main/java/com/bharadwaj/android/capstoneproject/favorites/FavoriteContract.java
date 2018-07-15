@@ -24,7 +24,9 @@ public class FavoriteContract {
         public static final String COLUMN_PLACE_RATING = "place_rating";
         public static final String COLUMN_PLACE_PRICE_LEVEL = "place_price_level";
         public static final String COLUMN_ADDRESS = "place_address";
-        //public static final String COLUMN_MOVIE_USER_RATING = "place_";
+        public static final String COLUMN_PLACE_PHONE_NUMBER = "place_phone_number";
+        public static final String COLUMN_PLACE_WEBSITE_URI = "place_website_uri";
+        public static final String COLUMN_PLACE_LATLONG = "place_website_latlong";
     }
 
 }

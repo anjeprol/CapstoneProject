@@ -49,6 +49,9 @@ public class FavoritePlaceContentProvider extends ContentProvider {
                         @Nullable String[] selectionArgs,
                         @Nullable String sortOrder) {
         final SQLiteDatabase favoritesDB = mFavoriteDBHelper.getReadableDatabase();
+
+/*
+
         Timber.v("Getting Readable DB instance");
         Timber.v("DB open status : %s", favoritesDB.isOpen());
         Timber.v("-------------------------------------------------------");
@@ -57,6 +60,8 @@ public class FavoritePlaceContentProvider extends ContentProvider {
         Timber.v("Selection arguments : %s", selectionArgs);
         Timber.v("Sort Order : %s", sortOrder);
         Timber.v("-------------------------------------------------------");
+
+*/
 
         int match = sUriMatcher.match(uri);
         Cursor cursor;

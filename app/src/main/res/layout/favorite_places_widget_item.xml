@@ -5,7 +5,7 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/widget_list_item_text_view"
+        android:id="@+id/widget_favorite_place_name_view"
         style="@style/placeTextStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

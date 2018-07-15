@@ -3,6 +3,7 @@ package com.bharadwaj.android.capstoneproject;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -31,7 +32,11 @@ import com.bharadwaj.android.capstoneproject.adapters.PlacesAdapter;
 import com.bharadwaj.android.capstoneproject.api_utils.GooglePlacesAPIResponse;
 import com.bharadwaj.android.capstoneproject.constants.Constants;
 import com.bharadwaj.android.capstoneproject.favorites.FavoriteAsyncTaskLoader;
+import com.bharadwaj.android.capstoneproject.favorites.FavoriteContract;
 import com.bharadwaj.android.capstoneproject.network.NetworkUtils;
+import com.bharadwaj.android.capstoneproject.utils.ExtractionUtils;
+import com.bharadwaj.android.capstoneproject.widget.FavoritePlacesWidgetProvider;
+import com.bharadwaj.android.capstoneproject.widget.UpdatePlacesWidgetService;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
@@ -45,6 +50,8 @@ import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -69,12 +76,6 @@ public class PlaceFragment extends Fragment implements
     // TODO: Customize parameters
     private int mColumnCount = 1;
     private String mPlaceType = "";
-
-    private OnCallButtonInteractionListener mCallButtonListener;
-    private OnMapsButtonInteractionListener mMapsButtonListener;
-    private OnWebsiteButtonInteractionListener mWebsiteButtonListener;
-    private OnShareButtonInteractionListener mShareButtonListener;
-    private OnFavoriteButtonInteractionListener mFavoriteButtonListener;
 
     PlacesAdapter placeAdapter;
 
@@ -125,7 +126,7 @@ public class PlaceFragment extends Fragment implements
         } else {
             mPlacesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), mColumnCount));
         }
-        placeAdapter = new PlacesAdapter(getActivity(), mCallButtonListener, mMapsButtonListener, mWebsiteButtonListener, mShareButtonListener, mFavoriteButtonListener);
+        placeAdapter = new PlacesAdapter(getActivity());
         mPlacesRecyclerView.setAdapter(placeAdapter);
 
         if(placeAdapter.isFavoriteContext()){
@@ -143,6 +144,10 @@ public class PlaceFragment extends Fragment implements
                 loadMobileAds();
             }
         }
+        UpdatePlacesWidgetService.startFavoritePlacesIntentService(getActivity(),
+                ExtractionUtils.getPlacesNamesListFromCursor(getActivity()));
+
+
         Timber.v("Leaving onCreateView (Context : " + getActivity() + " )" );
 
         return view;
@@ -385,12 +390,6 @@ public class PlaceFragment extends Fragment implements
         sharedPreferences.edit().putString(getString(R.string.pref_location_key), prepareLocationData(currentPlace)).apply();
 
         loadPlaces(mPlaceType, "");
-
-        //findPreference(getString(R.string.pref_location_key)).setSummary(getLocationData(0));
-        /*Timber.v("Value should be : %s", PreferenceManager.getDefaultSharedPreferences(getActivity())
-                .getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default)));
-        Timber.v("Summary should be : %s", PreferenceManager.getDefaultSharedPreferences(getActivity())
-                .getString(currentPlace.getAddress().toString(), currentPlace.getAddress().toString()));*/
     }
 
     private String getFormattedLocationString(LatLng latLng) {
@@ -463,6 +462,8 @@ public class PlaceFragment extends Fragment implements
                         }else{
                             placeAdapter.setCursor(cursor);
                         }
+                        UpdatePlacesWidgetService.startFavoritePlacesIntentService(getActivity(),
+                                ExtractionUtils.getPlacesNamesListFromCursor(getActivity()));
                     }
                 }
 
@@ -518,81 +519,5 @@ public class PlaceFragment extends Fragment implements
     public void onLoaderReset(Loader loader) {
         Timber.d("Entering onLoaderReset");
         Timber.d("Leaving onLoaderReset");
-    }
-
-
-
-
-
-
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnCallButtonInteractionListener) {
-            mCallButtonListener = (OnCallButtonInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnCallButtonInteractionListener");
-        }
-
-
-        if (context instanceof OnMapsButtonInteractionListener) {
-            mMapsButtonListener = (OnMapsButtonInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnMapsButtonInteractionListener");
-        }
-
-        if (context instanceof OnWebsiteButtonInteractionListener) {
-            mWebsiteButtonListener = (OnWebsiteButtonInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnWebsiteButtonInteractionListener");
-        }
-
-        if (context instanceof OnShareButtonInteractionListener) {
-            mShareButtonListener = (OnShareButtonInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnShareButtonInteractionListener");
-        }
-
-        if (context instanceof OnFavoriteButtonInteractionListener) {
-            mFavoriteButtonListener = (OnFavoriteButtonInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFavoriteButtonInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mCallButtonListener = null;
-        mMapsButtonListener = null;
-        mWebsiteButtonListener = null;
-        mShareButtonListener = null;
-        mFavoriteButtonListener = null;
-    }
-
-    public interface OnCallButtonInteractionListener {
-        void onCallButtonInteraction(String item);
-    }
-
-    public interface OnMapsButtonInteractionListener {
-        void onMapsButtonInteraction(String item);
-    }
-
-    public interface OnWebsiteButtonInteractionListener {
-        void onWebsiteButtonInteraction(Uri item);
-    }
-
-    public interface OnShareButtonInteractionListener {
-        void onShareButtonInteraction(Uri item);
-    }
-
-    public interface OnFavoriteButtonInteractionListener {
-        void onFavoriteButtonInteraction(Place item);
     }
 }

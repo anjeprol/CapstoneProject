@@ -18,7 +18,7 @@
     <string name="radius_units">km</string>
     <string name="radius_dialog_title">Search Radius</string>
     <string name="radius_seekbar_key">Radius Seekbar key</string>
-    <string name="radius_default">1</string>
+    <string name="radius_default">2</string>
     <string name="settings_toolbar_title">Settings</string>
     <string name="amusement_parks">Amusement Parks</string>
     <string name="pharmacy">Pharmacy</string>
@@ -46,5 +46,6 @@
     <string name="favorites_toolbar_title">Favorite Places</string>
     <string name="action_sort_by_default">Default</string>
     <string name="widget_ingredients">Ingredients</string>
+    <string name="navigation_view_explanation_text">Please select one of below categories to see relevant places</string>
 
 </resources>
