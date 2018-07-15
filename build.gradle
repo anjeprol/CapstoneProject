@@ -30,8 +30,9 @@ ext {
     gson_version = "2.8.2"
     timber_version = "4.7.0"
 
-    material_favorite_version = "0.1.4"
     butterknife = "8.8.1"
+
+    parceler = "1.1.10"
 
     gms_maps_version = "15.0.1"
     gms_places_version = "15.0.1"
