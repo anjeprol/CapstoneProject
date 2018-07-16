@@ -62,9 +62,9 @@ public final class Constants {
     public static final int RADIUS_MULTIPLIER = 1000;
     public static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 101;
 
-    public static final String NO_PLACES_EXPLANATION_TEXT = "Sorry. No Places found";
-    public static final String NO_FAVORITES_EXPLANATION_TEXT = "No Favorite Places Yet.";
-    public static final String FAVORITES_SWIPE_EXPLANATION_TEXT = "Here're your Favorite Places. \nSwipe left/right to delete a place.";
+    public static final String NO_PLACES_EXPLANATION_TEXT = "Sorry. No CustomPlace found";
+    public static final String NO_FAVORITES_EXPLANATION_TEXT = "No Favorite CustomPlace Yet.";
+    public static final String FAVORITES_SWIPE_EXPLANATION_TEXT = "Here're your Favorite CustomPlace. \nSwipe left/right to delete a place.";
 
     public static final String PLACES_NAMES_LIST = "places_names";
     public static final String UPDATE_ACTION = "android.appwidget.action.APPWIDGET_UPDATE";
@@ -72,4 +72,6 @@ public final class Constants {
     public static final String RECYCLER_VIEW_STATE = "Recycler View state";
     public static final String CONFIGURATION_CHANGED = "device_rotated";
     public static final String SAVED_PLACES_ARRAY = "saving places array";
+    public static final String PLACES_LOAD_FAILED = "Sorry. Failed to load CustomPlace";
+    public static final String SAVED_CURSOR = "saved_cursor";
 }

@@ -30,7 +30,7 @@ public class NetworkUtils {
         preferenceMap.put("key", "AIzaSyDShKzie-o9lFY0a6zdBuLTAf95DDV_W9w");
 */
 
-        Timber.d("Fetching Places on Network");
+        Timber.d("Fetching CustomPlace on Network");
         return ServiceCreator.createService(RequestBuilder.class, Constants.BASE_URL).getPlaces(preferenceMap);
     }
 

@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
@@ -33,6 +34,7 @@ import com.bharadwaj.android.capstoneproject.constants.Constants;
 import com.bharadwaj.android.capstoneproject.favorites.FavoriteAsyncTaskLoader;
 import com.bharadwaj.android.capstoneproject.network.NetworkUtils;
 import com.bharadwaj.android.capstoneproject.utils.ExtractionUtils;
+import com.bharadwaj.android.capstoneproject.utils.CustomPlace;
 import com.bharadwaj.android.capstoneproject.widget.UpdatePlacesWidgetService;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -76,7 +78,8 @@ public class PlaceFragment extends Fragment implements
 
     PlacesAdapter placeAdapter;
     Parcelable layoutManagerSavedState;
-    List<Place> savedPlacesArray;
+    List<CustomPlace> placesArray;
+    Cursor saveCursor;
 
     boolean mConfigurationChanged = false;
     boolean mLocationPermissionGranted = false;
@@ -109,23 +112,7 @@ public class PlaceFragment extends Fragment implements
         super.onCreate(savedInstanceState);
         Timber.v("Entering onCreate");
 
-        if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-            if(getArguments().containsKey(Constants.TYPE_OF_PLACE)){
-                mPlaceType = getArguments().getString(Constants.TYPE_OF_PLACE);
-            }
-            mConfigurationChanged = getArguments().getBoolean(Constants.CONFIGURATION_CHANGED);
-            Timber.v("mConfigurationChanged : " + mConfigurationChanged);
-        }
-
-        if(savedInstanceState != null){
-            if(savedInstanceState.containsKey(Constants.RECYCLER_VIEW_STATE)){
-                layoutManagerSavedState = savedInstanceState.getParcelable(Constants.RECYCLER_VIEW_STATE);
-            }
-            savedPlacesArray = Parcels.unwrap(savedInstanceState.getParcelable(Constants.SAVED_PLACES_ARRAY));
-            Timber.v("savedPlacesArray : " + savedPlacesArray.size());
-        }
-
+        setRetainInstance(true);
 
         Timber.v("Leaving onCreate");
     }
@@ -136,6 +123,23 @@ public class PlaceFragment extends Fragment implements
         Timber.v("Entering onCreateView (Context : " + getActivity() + " )" );
         View view = inflater.inflate(R.layout.fragment_place_list, container, false);
         ButterKnife.bind(this, view);
+
+        if(savedInstanceState != null){
+            mConfigurationChanged = savedInstanceState.getBoolean(Constants.CONFIGURATION_CHANGED);
+            Timber.v("Retrieved configurationChanged : %s", mConfigurationChanged);
+
+            if(savedInstanceState.containsKey(Constants.SAVED_PLACES_ARRAY)){
+                placesArray = Parcels.unwrap(savedInstanceState.getParcelable(Constants.SAVED_PLACES_ARRAY));
+            }
+
+        }
+
+        if (getArguments() != null) {
+            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+            if(getArguments().containsKey(Constants.TYPE_OF_PLACE)){
+                mPlaceType = getArguments().getString(Constants.TYPE_OF_PLACE);
+            }
+        }
 
         if (mColumnCount <= 1) {
             mPlacesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -160,9 +164,8 @@ public class PlaceFragment extends Fragment implements
                     if(mConfigurationChanged){
                         Timber.v("Need not load places");
                         showRecyclerViewAndHideProgressBar();
-                        placeAdapter.fillPlacesData(savedPlacesArray);
-                        Timber.v("layoutManagerSavedState : " + layoutManagerSavedState);
-                        //mPlacesRecyclerView.getLayoutManager().onRestoreInstanceState(layoutManagerSavedState);
+                        placeAdapter.fillPlacesData(placesArray);
+                        mPlacesRecyclerView.getLayoutManager().onRestoreInstanceState(layoutManagerSavedState);
                     }else{
                         loadPlaces(mPlaceType, "");
                     }
@@ -181,7 +184,7 @@ public class PlaceFragment extends Fragment implements
     }
 
     private void showFavoritePlaces() {
-        Timber.v("Starting Loader for loading Favorite Places");
+        Timber.v("Starting Loader for loading Favorite CustomPlace");
         setupItemTouchHelperCallback();
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(mPlacesRecyclerView);
 
@@ -198,12 +201,12 @@ public class PlaceFragment extends Fragment implements
             @Override
             public void onResponse(Call<GooglePlacesAPIResponse> call, Response<GooglePlacesAPIResponse> response) {
                 GooglePlacesAPIResponse googlePlacesAPIResponse = response.body();
-                Timber.v("Places size: %s", googlePlacesAPIResponse.getResults().size());
+                Timber.v("CustomPlace size: %s", googlePlacesAPIResponse.getResults().size());
                 if (googlePlacesAPIResponse.getStatus().equalsIgnoreCase(Constants.OK)) {
-                    Timber.v("Places API response : OK");
+                    Timber.v("CustomPlace API response : OK");
                     getPlaceDataFromPlaceID(googlePlacesAPIResponse);
                 } else {
-                    Timber.v("Places API response : %s", googlePlacesAPIResponse.getStatus());
+                    Timber.v("CustomPlace API response : %s", googlePlacesAPIResponse.getStatus());
                 }
 
                 if(googlePlacesAPIResponse.getResults().isEmpty()){
@@ -232,25 +235,35 @@ public class PlaceFragment extends Fragment implements
             mGeoDataClient = Places.getGeoDataClient(getActivity());
             Timber.v("GeoDataClient : %s", mGeoDataClient.toString());
             mGeoDataClient.getPlaceById(getPlaceIdsAsArray(googlePlacesAPIResponse)).addOnCompleteListener(new OnCompleteListener<PlaceBufferResponse>() {
-                List<Place> placesArray = new ArrayList<>();
 
                 @Override
                 public void onComplete(@NonNull Task<PlaceBufferResponse> task) {
                     Timber.v("In OnCompleteListener's onComplete. Task successful : %s", task.isSuccessful());
+                    showRecyclerViewAndHideProgressBar();
                     if (task.isSuccessful()) {
                         PlaceBufferResponse places = task.getResult();
-                        Timber.v("Places count: %s", places.getCount());
+                        Timber.v("CustomPlace count: %s", places.getCount());
 
+                        placesArray  = new ArrayList<>();
+                        CustomPlace customPlace;
                         for (Place place : places) {
                             //Timber.v("Place found: %s", place.getName());
-                            placesArray.add(place);
+
+                            customPlace = new CustomPlace(place.getId(),
+                                String.valueOf(place.getName()),
+                                String.valueOf(place.getRating()),
+                                String.valueOf(place.getPriceLevel()),
+                                String.valueOf(place.getAddress()),
+                                String.valueOf(place.getPhoneNumber()),
+                                String.valueOf(place.getWebsiteUri()),
+                                ExtractionUtils.getFormattedLocationString(place.getLatLng()));
+                            placesArray.add(customPlace);
                         }
-                        //places.release();
-                        savedPlacesArray = placesArray;
                         placeAdapter.fillPlacesData(placesArray);
-                        showRecyclerViewAndHideProgressBar();
                     } else {
                         Timber.e("getPlaceById operation failed.");
+                        mNoPlacesExplanationView.setVisibility(View.VISIBLE);
+                        mNoPlacesExplanationView.setText(Constants.PLACES_LOAD_FAILED);
                         Toast.makeText(getActivity(), getString(R.string.operation_failed), Toast.LENGTH_LONG).show();
                     }
                 }
@@ -406,7 +419,7 @@ public class PlaceFragment extends Fragment implements
                 Timber.v("Is Task successful : %s", task.isSuccessful());
                 if(task.isSuccessful()){
                     PlaceLikelihoodBufferResponse likelyPlaces = task.getResult();
-                    //Timber.v("Likely Places Count : %s", likelyPlaces.getCount());
+                    //Timber.v("Likely CustomPlace Count : %s", likelyPlaces.getCount());
 
                     PlaceLikelihood placeLikelihood = likelyPlaces.get(0);
                     if(likelyPlaces.getCount()!=0){
@@ -514,8 +527,26 @@ public class PlaceFragment extends Fragment implements
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
+        Timber.v("onSaveInstanceState");
+        outState.putBoolean(Constants.CONFIGURATION_CHANGED, true);
         outState.putParcelable(Constants.RECYCLER_VIEW_STATE, mPlacesRecyclerView.getLayoutManager().onSaveInstanceState());
-        outState.putParcelable(Constants.SAVED_PLACES_ARRAY, Parcels.wrap(savedPlacesArray));
+        outState.putParcelable(Constants.SAVED_PLACES_ARRAY, Parcels.wrap(placesArray));
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        Timber.v("onViewStateRestored");
+
+        if(savedInstanceState != null){
+            if(savedInstanceState.containsKey(Constants.RECYCLER_VIEW_STATE)){
+                layoutManagerSavedState = savedInstanceState.getParcelable(Constants.RECYCLER_VIEW_STATE);
+                mPlacesRecyclerView.getLayoutManager().onRestoreInstanceState(layoutManagerSavedState);
+                Timber.v("layoutManagerSavedState in onViewStateRestored : " + layoutManagerSavedState);
+
+            }
+        }
+
     }
 
     @NonNull
@@ -542,14 +573,18 @@ public class PlaceFragment extends Fragment implements
         Timber.v("LOADER ID : %s", loader.getId());
 
         if (cursor == null) {
-            Timber.v("No Places to show");
+            Timber.v("No CustomPlace to show");
             return;
         }
 
         switch (loader.getId()) {
             case FAVORITES_LOADER_ID:
+
+                saveCursor = cursor;
+
                 Timber.v("Cursor length : %s", cursor.getCount());
                 placeAdapter.setCursor(cursor);
+                mPlacesRecyclerView.getLayoutManager().onRestoreInstanceState(layoutManagerSavedState);
                 if (cursor.getCount() == 0) {
                     mNoPlacesExplanationView.setVisibility(View.VISIBLE);
                     mNoPlacesExplanationView.setText(Constants.NO_FAVORITES_EXPLANATION_TEXT);

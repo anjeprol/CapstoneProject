@@ -24,9 +24,9 @@ import com.bharadwaj.android.capstoneproject.constants.Constants;
 import com.bharadwaj.android.capstoneproject.favorites.FavoriteContract;
 import com.bharadwaj.android.capstoneproject.favorites.FavoriteContract.Favorites;
 import com.bharadwaj.android.capstoneproject.favorites.FavoritesActivity;
+import com.bharadwaj.android.capstoneproject.utils.CustomPlace;
 import com.bharadwaj.android.capstoneproject.utils.ExtractionUtils;
 import com.bharadwaj.android.capstoneproject.widget.UpdatePlacesWidgetService;
-import com.google.android.gms.location.places.Place;
 
 import org.parceler.Parcels;
 
@@ -39,7 +39,7 @@ import timber.log.Timber;
 public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.PlaceViewHolder> {
 
     private Cursor mCursor;
-    private List<Place> mPlaces;
+    private List<CustomPlace> mPlaces;
     private boolean isContextFavorites = false;
     public static final int FAVORITES_LOADER_ID = 51;
 
@@ -58,8 +58,8 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.PlaceViewH
         return isContextFavorites;
     }
 
-    public void fillPlacesData(List<Place> places) {
-        Timber.v("Filling Places into Adapter...");
+    public void fillPlacesData(List<CustomPlace> places) {
+        Timber.v("Filling CustomPlace into Adapter...");
         this.mPlaces = places;
         notifyDataSetChanged();
     }
@@ -97,10 +97,9 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.PlaceViewH
         final String placeWebsiteUri;
         final String placeLatLong;
 
-        final Place currentPlace;
+        CustomPlace currentPlace;
 
         if(isContextFavorites){
-            currentPlace = null;
             mCursor.moveToPosition(position);
             placeId = mCursor.getString(mCursor.getColumnIndex(Favorites.COLUMN_PLACE_ID));
             placeName = mCursor.getString(mCursor.getColumnIndex(Favorites.COLUMN_PLACE_NAME));
@@ -113,18 +112,17 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.PlaceViewH
 
         }else{
             currentPlace = mPlaces.get(position);
-            placeId = currentPlace.getId();
-            placeName = String.valueOf(currentPlace.getName());
-            placeRating = String.valueOf(currentPlace.getRating());
-            placePriceLevel = String.valueOf(currentPlace.getPriceLevel());
-            placeAddress = String.valueOf(currentPlace.getAddress());
-            placePhoneNumber = String.valueOf(currentPlace.getPhoneNumber());
-            placeWebsiteUri = String.valueOf(currentPlace.getWebsiteUri());
-            placeLatLong = ExtractionUtils.getFormattedLocationString(currentPlace.getLatLng());
+            placeId = currentPlace.getPlaceId();
+            placeName = String.valueOf(currentPlace.getPlaceName());
+            placeRating = String.valueOf(currentPlace.getPlaceRating());
+            placePriceLevel = String.valueOf(currentPlace.getPlacePriceLevel());
+            placeAddress = String.valueOf(currentPlace.getPlaceAddress());
+            placePhoneNumber = String.valueOf(currentPlace.getPlacePhoneNumber());
+            placeWebsiteUri = String.valueOf(currentPlace.getPlaceWebsiteUri());
+            placeLatLong = currentPlace.getPlaceLatLong();
         }
 
         placeViewHolder.placeId = placeId;
-
         placeViewHolder.placeNameView.setText(placeName);
         placeViewHolder.placeRatingView.setText(placeRating);
         placeViewHolder.placeRatingBar.setRating(Float.valueOf(placeRating));

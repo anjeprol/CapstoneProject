@@ -23,7 +23,7 @@ public class UpdatePlacesWidgetService extends IntentService {
         Timber.d("Entering startFavoritePlacesIntentService");
         Intent intent = new Intent(context, UpdatePlacesWidgetService.class);
 
-        Timber.v("Places count in startFavoritePlacesIntentService : %s", placesNamesList.size());
+        Timber.v("CustomPlace count in startFavoritePlacesIntentService : %s", placesNamesList.size());
 
         intent.putExtra(Constants.PLACES_NAMES_LIST, Parcels.wrap(placesNamesList));
         context.startService(intent);
@@ -36,7 +36,7 @@ public class UpdatePlacesWidgetService extends IntentService {
         if (intent != null) {
             ArrayList<String> placesNamesList = Parcels.unwrap(intent.getExtras().getParcelable(Constants.PLACES_NAMES_LIST));
             Intent newIntent = new Intent(Constants.UPDATE_ACTION);
-            Timber.v("Places in onHandleIntent : %s", placesNamesList.size());
+            Timber.v("CustomPlace in onHandleIntent : %s", placesNamesList.size());
             newIntent.setAction(Constants.UPDATE_ACTION);
             newIntent.putExtra(Constants.PLACES_NAMES_LIST, Parcels.wrap(placesNamesList));
 

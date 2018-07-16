@@ -73,7 +73,7 @@ public class FavoritePlacesWidgetProvider extends AppWidgetProvider {
 
         if (action != null && action.equals(Constants.UPDATE_ACTION)) {
             placesNamesList = Parcels.unwrap(intent.getExtras().getParcelable(Constants.PLACES_NAMES_LIST));
-            //Timber.v("Places in onReceive has %s items", placesNamesList.size());
+            //Timber.v("CustomPlace in onReceive has %s items", placesNamesList.size());
 
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.favorite_places_widget_list_view);
 
