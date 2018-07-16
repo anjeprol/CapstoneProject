@@ -43,6 +43,7 @@ public class FavoritePlacesWidgetRemoteViewsFactory implements RemoteViewsServic
 
     @Override
     public int getCount() {
+        Timber.v("testing count : " + mFavoritePlacesNames);
         return mFavoritePlacesNames != null ? mFavoritePlacesNames.size() : 0;
     }
 

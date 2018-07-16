@@ -8,6 +8,8 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 
+import timber.log.Timber;
+
 public class ExtractionUtils {
 
     public static ArrayList<String> getPlacesNamesListFromCursor(Context context) {
@@ -19,6 +21,7 @@ public class ExtractionUtils {
                 null,
                 null,
                 null);
+        Timber.v("Cursor length : " + cursor.getCount());
         for (int i = 0 ;i < cursor.getCount(); i++){
             cursor.moveToPosition(i);
             String placeName = cursor.getString(cursor.getColumnIndex(FavoriteContract.Favorites.COLUMN_PLACE_NAME));

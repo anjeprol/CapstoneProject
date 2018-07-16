@@ -69,4 +69,7 @@ public final class Constants {
     public static final String PLACES_NAMES_LIST = "places_names";
     public static final String UPDATE_ACTION = "android.appwidget.action.APPWIDGET_UPDATE";
     public static final String NULL = "null";
+    public static final String RECYCLER_VIEW_STATE = "Recycler View state";
+    public static final String CONFIGURATION_CHANGED = "device_rotated";
+    public static final String SAVED_PLACES_ARRAY = "saving places array";
 }

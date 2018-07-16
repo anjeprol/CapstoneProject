@@ -47,5 +47,14 @@
     <string name="action_sort_by_default">Default</string>
     <string name="widget_ingredients">Ingredients</string>
     <string name="navigation_view_explanation_text">Please select one of below categories to see relevant places</string>
+    <string name="place_name">Place Name</string>
+    <string name="place_favorite">Place Favorite</string>
+    <string name="not_connected">Not connected to Internet.</string>
+    <string name="places_load_failed">Places load failed</string>
+    <string name="operation_failed">Operation failed</string>
+    <string name="select_location">Please select a location in Settings</string>
+    <string name="phone_empty">Phone number empty</string>
+    <string name="website_empty">No Website linked</string>
+    <string name="no_website_to_share">No Website linked to share</string>
 
 </resources>

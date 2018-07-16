@@ -25,6 +25,7 @@ import com.bharadwaj.android.capstoneproject.favorites.FavoriteContract;
 import com.bharadwaj.android.capstoneproject.favorites.FavoriteContract.Favorites;
 import com.bharadwaj.android.capstoneproject.favorites.FavoritesActivity;
 import com.bharadwaj.android.capstoneproject.utils.ExtractionUtils;
+import com.bharadwaj.android.capstoneproject.widget.UpdatePlacesWidgetService;
 import com.google.android.gms.location.places.Place;
 
 import org.parceler.Parcels;
@@ -135,7 +136,7 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.PlaceViewH
             public void onClick(View v) {
                 Timber.v("Call button clicked. ");
                 if (TextUtils.isEmpty(placePhoneNumber)) {
-                    Toast.makeText(mContext, "Phone number empty", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, mContext.getString(R.string.phone_empty), Toast.LENGTH_SHORT).show();
                 } else {
                     Uri phoneCallUri = Uri.parse(Constants.CALL_INTENT_DATA + placePhoneNumber);
                     Intent callIntent = new Intent(Intent.ACTION_DIAL, phoneCallUri);
@@ -165,7 +166,7 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.PlaceViewH
             public void onClick(View v) {
                 Timber.v("Website button clicked. ");
                 if (TextUtils.isEmpty(placeWebsiteUri) || placeWebsiteUri.trim().equalsIgnoreCase(Constants.NULL)) {
-                    Toast.makeText(mContext, "No Website linked", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, mContext.getString(R.string.website_empty), Toast.LENGTH_SHORT).show();
                 }else {
                     Intent websiteIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(placeWebsiteUri));
                     if (isIntentAvailable(websiteIntent)) {
@@ -181,7 +182,7 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.PlaceViewH
             public void onClick(View v) {
                 Timber.v("Share button clicked. ");
                 if (TextUtils.isEmpty(placeWebsiteUri) || placeWebsiteUri.trim().equalsIgnoreCase(Constants.NULL)) {
-                    Toast.makeText(mContext, "No Website linked to share", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, mContext.getString(R.string.no_website_to_share), Toast.LENGTH_SHORT).show();
                 }else{
                     Intent shareIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.SMS_INTENT_DATA));
                     shareIntent.putExtra(Constants.SMS_BODY_HEADER, Constants.SMS_BODY + placeWebsiteUri);
@@ -214,7 +215,8 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.PlaceViewH
                             placePhoneNumber, placeWebsiteUri, placeLatLong);
                     placeViewHolder.placeFavoriteButton.setImageResource(R.drawable.ic_favorite_filled);
                 }
-
+                UpdatePlacesWidgetService.startFavoritePlacesIntentService(mContext,
+                        ExtractionUtils.getPlacesNamesListFromCursor(mContext));
             }
         });
 
@@ -270,9 +272,6 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.PlaceViewH
                 selectionArgs);
         if (rowsDeleted != 0) {
             Timber.v("Rows deleted : %s", rowsDeleted);
-            Timber.v("This movie removed as a favorite ");
-        } else {
-            Timber.v("This movie is not in th favorites DB ");
         }
         SendBroadcastToupdateAppWidgets();
     }

@@ -6,7 +6,7 @@ android {
         release {
             keyAlias 'Bharadwaj'
             keyPassword 'vnsRoyal@2892'
-            storeFile file('/Users/Bharadwaj/android')
+            storeFile file('../app/keystore/android')
             storePassword 'vnsRoyal@2892'
         }
     }

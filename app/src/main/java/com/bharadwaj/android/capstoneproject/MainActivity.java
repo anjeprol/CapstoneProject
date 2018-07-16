@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity
 
     PlaceFragment mPlaceFragment;
     String placeType;
+    boolean configurationChanged = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +36,10 @@ public class MainActivity extends AppCompatActivity
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        if(savedInstanceState != null){
+            configurationChanged = savedInstanceState.getBoolean(Constants.CONFIGURATION_CHANGED);
+        }
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         placeType = sharedPreferences.getString(Constants.TYPE_OF_PLACE, "");
@@ -52,9 +57,12 @@ public class MainActivity extends AppCompatActivity
         mPlaceFragment = new PlaceFragment();
         Bundle bundle = new Bundle();
         bundle.putString(Constants.TYPE_OF_PLACE, placeType);
+        bundle.putBoolean(Constants.CONFIGURATION_CHANGED, configurationChanged);
         mPlaceFragment.setArguments(bundle);
         Timber.v("Saved Place type : %s", placeType);
-        getSupportFragmentManager().beginTransaction().replace(R.id.map_fragment_placeholder, mPlaceFragment).commit();
+        if(savedInstanceState == null){
+            getSupportFragmentManager().beginTransaction().replace(R.id.map_fragment_placeholder, mPlaceFragment).addToBackStack("Test").commit();
+        }
 
         Timber.d("Leaving onCreate");
     }
@@ -183,5 +191,10 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(Constants.CONFIGURATION_CHANGED, true);
+    }
 }
 

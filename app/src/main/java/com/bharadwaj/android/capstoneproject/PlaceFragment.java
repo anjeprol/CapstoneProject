@@ -2,15 +2,13 @@ package com.bharadwaj.android.capstoneproject;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -33,10 +31,8 @@ import com.bharadwaj.android.capstoneproject.adapters.PlacesAdapter;
 import com.bharadwaj.android.capstoneproject.api_utils.GooglePlacesAPIResponse;
 import com.bharadwaj.android.capstoneproject.constants.Constants;
 import com.bharadwaj.android.capstoneproject.favorites.FavoriteAsyncTaskLoader;
-import com.bharadwaj.android.capstoneproject.favorites.FavoriteContract;
 import com.bharadwaj.android.capstoneproject.network.NetworkUtils;
 import com.bharadwaj.android.capstoneproject.utils.ExtractionUtils;
-import com.bharadwaj.android.capstoneproject.widget.FavoritePlacesWidgetProvider;
 import com.bharadwaj.android.capstoneproject.widget.UpdatePlacesWidgetService;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -79,7 +75,10 @@ public class PlaceFragment extends Fragment implements
     private String mPlaceType = "";
 
     PlacesAdapter placeAdapter;
+    Parcelable layoutManagerSavedState;
+    List<Place> savedPlacesArray;
 
+    boolean mConfigurationChanged = false;
     boolean mLocationPermissionGranted = false;
 
     @BindView(R.id.noPlacesExplanationView)
@@ -109,12 +108,25 @@ public class PlaceFragment extends Fragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Timber.v("Entering onCreate");
+
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
             if(getArguments().containsKey(Constants.TYPE_OF_PLACE)){
                 mPlaceType = getArguments().getString(Constants.TYPE_OF_PLACE);
             }
+            mConfigurationChanged = getArguments().getBoolean(Constants.CONFIGURATION_CHANGED);
+            Timber.v("mConfigurationChanged : " + mConfigurationChanged);
         }
+
+        if(savedInstanceState != null){
+            if(savedInstanceState.containsKey(Constants.RECYCLER_VIEW_STATE)){
+                layoutManagerSavedState = savedInstanceState.getParcelable(Constants.RECYCLER_VIEW_STATE);
+            }
+            savedPlacesArray = Parcels.unwrap(savedInstanceState.getParcelable(Constants.SAVED_PLACES_ARRAY));
+            Timber.v("savedPlacesArray : " + savedPlacesArray.size());
+        }
+
+
         Timber.v("Leaving onCreate");
     }
 
@@ -139,12 +151,21 @@ public class PlaceFragment extends Fragment implements
         }else{
             showProgressBarAndHideRecyclerView();
             if(!NetworkUtils.isConnectedToInternet(getActivity())){
-                Toast.makeText(getActivity(), "Not connected to Internet.", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), getString(R.string.not_connected), Toast.LENGTH_LONG).show();
             }else{
                 if(isLocationDefaultNotSet()){
+                    Timber.v("Location default not set");
                     checkRequestPermissionsAndSetDefaults();
                 }else{
-                    loadPlaces(mPlaceType, "");
+                    if(mConfigurationChanged){
+                        Timber.v("Need not load places");
+                        showRecyclerViewAndHideProgressBar();
+                        placeAdapter.fillPlacesData(savedPlacesArray);
+                        Timber.v("layoutManagerSavedState : " + layoutManagerSavedState);
+                        //mPlacesRecyclerView.getLayoutManager().onRestoreInstanceState(layoutManagerSavedState);
+                    }else{
+                        loadPlaces(mPlaceType, "");
+                    }
                 }
 
                 loadMobileAds();
@@ -198,7 +219,7 @@ public class PlaceFragment extends Fragment implements
             public void onFailure(Call<GooglePlacesAPIResponse> call, Throwable throwable) {
                 Timber.v("In onFailure : %s", throwable.getMessage());
                 Timber.v("Stack Trace : %s", throwable.getStackTrace());
-                Toast.makeText(getActivity(), "Places load failed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), getString(R.string.places_load_failed), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -225,12 +246,12 @@ public class PlaceFragment extends Fragment implements
                             placesArray.add(place);
                         }
                         //places.release();
-
+                        savedPlacesArray = placesArray;
                         placeAdapter.fillPlacesData(placesArray);
                         showRecyclerViewAndHideProgressBar();
                     } else {
                         Timber.e("getPlaceById operation failed.");
-                        Toast.makeText(getActivity(), "Operation failed", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), getString(R.string.operation_failed), Toast.LENGTH_LONG).show();
                     }
                 }
             });
@@ -366,7 +387,7 @@ public class PlaceFragment extends Fragment implements
         if (mLocationPermissionGranted) {
             getCurrentPlaceAndSetAsDefault();
         }else{
-            Toast.makeText(getActivity(), "Please select a location in Settings", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), getString(R.string.select_location), Toast.LENGTH_LONG).show();
         }
         Timber.v("Leaving onRequestPermissionsResult");
 
@@ -395,7 +416,7 @@ public class PlaceFragment extends Fragment implements
                     }
                     likelyPlaces.release();
                 }else{
-                    Toast.makeText(getActivity(), "Operation failed", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), getString(R.string.operation_failed), Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -490,6 +511,13 @@ public class PlaceFragment extends Fragment implements
         };
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(Constants.RECYCLER_VIEW_STATE, mPlacesRecyclerView.getLayoutManager().onSaveInstanceState());
+        outState.putParcelable(Constants.SAVED_PLACES_ARRAY, Parcels.wrap(savedPlacesArray));
+    }
+
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int loaderID, Bundle bundle) {
@@ -539,4 +567,5 @@ public class PlaceFragment extends Fragment implements
         Timber.d("Entering onLoaderReset");
         Timber.d("Leaving onLoaderReset");
     }
+
 }

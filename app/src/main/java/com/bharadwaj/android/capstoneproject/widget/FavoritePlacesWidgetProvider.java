@@ -11,6 +11,7 @@ import android.widget.RemoteViews;
 import com.bharadwaj.android.capstoneproject.R;
 import com.bharadwaj.android.capstoneproject.constants.Constants;
 import com.bharadwaj.android.capstoneproject.favorites.FavoritesActivity;
+import com.bharadwaj.android.capstoneproject.utils.ExtractionUtils;
 
 import org.parceler.Parcels;
 
@@ -21,11 +22,13 @@ import timber.log.Timber;
 public class FavoritePlacesWidgetProvider extends AppWidgetProvider {
 
     static ArrayList<String> placesNamesList;
-    static ArrayList<String> initialPlacesNamesList;
 
     public static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
         Timber.d("Entering updateAppWidget");
+
+        placesNamesList = ExtractionUtils.getPlacesNamesListFromCursor(context);
+
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.fevorite_places_widget);
 
@@ -39,6 +42,7 @@ public class FavoritePlacesWidgetProvider extends AppWidgetProvider {
         // Set the FavoritePlacesWidgetRemoteViewsService intent to act as the adapter for the GridView
         Intent intent = new Intent(context, FavoritePlacesWidgetRemoteViewsService.class);
         views.setRemoteAdapter(R.id.favorite_places_widget_list_view, intent);
+
 
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);
@@ -80,20 +84,5 @@ public class FavoritePlacesWidgetProvider extends AppWidgetProvider {
         Timber.d("Leaving onReceive");
 
     }
-
-    @Override
-    public void onEnabled(Context context) {
-        // Enter relevant functionality for when the first widget is created
-    }
-
-    @Override
-    public void onDisabled(Context context) {
-        // Enter relevant functionality for when the last widget is disabled
-    }
-
-    public static void setInitialPlacesNamesList(ArrayList<String> placesNamesList) {
-        initialPlacesNamesList = placesNamesList;
-    }
-
 }
 

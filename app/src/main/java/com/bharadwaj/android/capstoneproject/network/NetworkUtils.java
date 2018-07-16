@@ -40,9 +40,9 @@ public class NetworkUtils {
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         boolean isConnectedToInternet = (networkInfo != null) && networkInfo.isConnectedOrConnecting();
         if (isConnectedToInternet) {
-            Timber.v("Not connected to Internet");
             return true;
         } else {
+            Timber.v("Not connected to Internet");
             return false;
         }
     }
